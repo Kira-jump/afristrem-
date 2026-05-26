@@ -25,6 +25,7 @@ declare module "lucide-react" {
   export const Search: LucideIcon;
   export const SlidersHorizontal: LucideIcon;
   export const Smartphone: LucideIcon;
+  export const Sparkles: LucideIcon;
   export const Star: LucideIcon;
   export const User: LucideIcon;
   export const Users: LucideIcon;

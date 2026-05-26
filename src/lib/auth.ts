@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
+import { trialEndDate } from "./access";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as never,
@@ -47,24 +48,43 @@ export const authOptions: NextAuthOptions = {
       if (token.email) {
         const db = await prisma.user.findUnique({
           where: { email: token.email },
-          select: { id: true, role: true, isPremium: true },
+          select: { id: true, role: true, isPremium: true, trialEndsAt: true },
         });
         if (db) {
           token.uid = db.id;
           token.role = db.role;
           token.isPremium = db.isPremium;
+          token.trialEndsAt = db.trialEndsAt ? db.trialEndsAt.toISOString() : null;
         }
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as { id?: string }).id = token.uid as string;
-        (session.user as { role?: string }).role = token.role as string;
-        (session.user as { isPremium?: boolean }).isPremium =
-          token.isPremium as boolean;
+        const u = session.user as {
+          id?: string;
+          role?: string;
+          isPremium?: boolean;
+          trialEndsAt?: string | null;
+        };
+        u.id = token.uid as string;
+        u.role = token.role as string;
+        u.isPremium = token.isPremium as boolean;
+        u.trialEndsAt = (token.trialEndsAt as string | null) ?? null;
       }
       return session;
+    },
+  },
+  events: {
+    async createUser({ user }) {
+      // Démarre l'essai 7 jours dès la création de compte (OAuth/Google).
+      // Les inscriptions Credentials sont déjà gérées dans /api/register.
+      if (user.email) {
+        await prisma.user.update({
+          where: { email: user.email },
+          data: { trialEndsAt: trialEndDate() },
+        });
+      }
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

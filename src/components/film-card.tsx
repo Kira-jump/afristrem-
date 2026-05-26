@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Crown, Play, Star } from "lucide-react";
+import { Play, Star } from "lucide-react";
 import type { FilmCard as Film } from "@/lib/films";
 import { formatDuration } from "@/lib/utils";
 
@@ -26,11 +26,6 @@ export function FilmCard({ film, size = "md" }: { film: Film; size?: "sm" | "md"
           className="object-cover transition duration-500 group-hover:scale-[1.04]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/20 to-transparent opacity-90" />
-        {film.isPremium && (
-          <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-gold-gradient px-2 py-0.5 text-[10px] font-semibold text-bg shadow-gold">
-            <Crown className="h-3 w-3" /> Premium
-          </span>
-        )}
         <div className="absolute inset-0 grid place-items-center opacity-0 transition group-hover:opacity-100">
           <span className="grid h-12 w-12 place-items-center rounded-full bg-gold text-bg shadow-gold">
             <Play className="h-5 w-5 fill-current" />

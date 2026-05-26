@@ -15,7 +15,6 @@ export default async function HomePage() {
 
   const trending = [...all].sort((a, b) => b.rating - a.rating).slice(0, 10);
   const newReleases = [...all].sort((a, b) => b.year - a.year).slice(0, 10);
-  const freeFilms = all.filter((f) => !f.isPremium);
   const byGenre = groupByGenre(all);
   const byOrigin = groupByOrigin(all);
 
@@ -33,11 +32,6 @@ export default async function HomePage() {
           title="Nouveautés"
           subtitle="Fraîchement ajoutés au catalogue"
           films={newReleases}
-        />
-        <FilmRow
-          title="Gratuit pour tous"
-          subtitle="Aucun abonnement requis"
-          films={freeFilms}
         />
 
         <PremiumCTA />

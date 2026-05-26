@@ -1,12 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Crown, Lock, Play, Star } from "lucide-react";
+import { Lock, Play, Sparkles, Star } from "lucide-react";
 import { getFilmBySlug, getRelatedFilms } from "@/lib/films";
 import { FilmRow } from "@/components/film-row";
 import { HlsPlayer } from "@/components/hls-player";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getAccessState } from "@/lib/access";
 import { formatDuration } from "@/lib/utils";
 
 export default async function FilmPage({
@@ -18,10 +19,7 @@ export default async function FilmPage({
   if (!film) notFound();
 
   const session = await getServerSession(authOptions);
-  const isLogged = !!session?.user;
-  const isPremium = !!session?.user?.isPremium;
-  const canWatch = !film.isPremium || isPremium;
-
+  const access = getAccessState(session);
   const related = await getRelatedFilms(film);
 
   return (
@@ -67,11 +65,6 @@ export default async function FilmPage({
               <span className="rounded-md border border-forest/40 bg-forest/20 px-2 py-0.5 text-xs text-forest-100">
                 {film.origin}
               </span>
-              {film.isPremium && (
-                <span className="inline-flex items-center gap-1 rounded-md bg-gold-gradient px-2 py-0.5 text-xs font-semibold text-bg">
-                  <Crown className="h-3 w-3" /> Premium
-                </span>
-              )}
             </div>
 
             <p className="mt-5 max-w-3xl text-white/80">{film.synopsis}</p>
@@ -102,39 +95,61 @@ export default async function FilmPage({
         </div>
 
         <section className="mx-auto mt-12 max-w-5xl">
-          {canWatch ? (
+          {access.canWatch ? (
             <>
-              <h2 className="mb-3 font-display text-2xl font-semibold">Lecture</h2>
-              <HlsPlayer src={film.videoUrl} poster={film.backdropUrl ?? film.thumbnailUrl} />
+              <div className="mb-3 flex items-end justify-between">
+                <h2 className="font-display text-2xl font-semibold">Lecture</h2>
+                {access.trialActive && !access.isPremium && (
+                  <span className="rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-xs text-gold">
+                    Essai gratuit · J-{access.trialDaysLeft}
+                  </span>
+                )}
+              </div>
+              <HlsPlayer
+                src={film.videoUrl}
+                poster={film.backdropUrl ?? film.thumbnailUrl}
+              />
             </>
           ) : (
             <div className="overflow-hidden rounded-2xl border border-gold/20 bg-gradient-to-br from-forest-900 via-bg to-bg p-8 text-center shadow-gold sm:p-12">
               <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-xs uppercase tracking-[0.2em] text-gold">
-                <Lock className="h-3.5 w-3.5" /> Contenu Premium
+                <Lock className="h-3.5 w-3.5" /> Réservé aux abonnés
               </span>
               <h3 className="mt-4 font-display text-2xl">
-                Débloquez <span className="text-gold-gradient">{film.title}</span>
+                Regarde <span className="text-gold-gradient">{film.title}</span>
+                <br />
+                <span className="text-gold-gradient">gratuitement pendant 7 jours.</span>
               </h3>
               <p className="mt-2 text-white/70">
-                Ce film fait partie de notre catalogue Premium. Abonnez-vous à partir de
-                <span className="font-semibold text-white"> 2,79 $/mois</span> pour y accéder.
+                Tout AfriStream — sans engagement, annulable à tout moment.
+                Ensuite, à partir de <span className="font-semibold text-white">2,79 $/mois</span>.
               </p>
               <div className="mt-6 flex flex-wrap justify-center gap-3">
-                {!isLogged && (
+                {!access.isLogged ? (
+                  <>
+                    <Link
+                      href={`/auth/register?callbackUrl=/film/${film.slug}`}
+                      className="inline-flex items-center gap-2 rounded-full bg-gold-gradient px-5 py-2.5 text-sm font-medium text-bg shadow-gold hover:brightness-110"
+                    >
+                      <Sparkles className="h-4 w-4" />
+                      Commencer mon essai gratuit
+                    </Link>
+                    <Link
+                      href={`/auth/login?callbackUrl=/film/${film.slug}`}
+                      className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm hover:bg-white/10"
+                    >
+                      J'ai déjà un compte
+                    </Link>
+                  </>
+                ) : (
                   <Link
-                    href={`/auth/login?callbackUrl=/film/${film.slug}`}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm hover:bg-white/10"
+                    href="/premium"
+                    className="inline-flex items-center gap-2 rounded-full bg-gold-gradient px-5 py-2.5 text-sm font-medium text-bg shadow-gold hover:brightness-110"
                   >
-                    Se connecter
+                    <Play className="h-4 w-4 fill-current" />
+                    Choisir mon abonnement
                   </Link>
                 )}
-                <Link
-                  href="/premium"
-                  className="inline-flex items-center gap-2 rounded-full bg-gold-gradient px-5 py-2.5 text-sm font-medium text-bg shadow-gold hover:brightness-110"
-                >
-                  <Play className="h-4 w-4 fill-current" />
-                  Devenir Premium
-                </Link>
               </div>
             </div>
           )}

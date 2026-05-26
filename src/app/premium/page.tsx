@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, Crown, CreditCard, Smartphone } from "lucide-react";
+import { Check, CreditCard, Smartphone, Sparkles } from "lucide-react";
 
 const plans = [
   {
@@ -9,7 +9,7 @@ const plans = [
     period: "/ mois",
     note: "Sans engagement",
     perks: [
-      "Catalogue Premium illimité",
+      "Catalogue complet",
       "Qualité HD",
       "Téléchargement hors-ligne",
       "Sans publicité",
@@ -36,19 +36,40 @@ const plans = [
 export default function PremiumPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 pb-16 pt-28 sm:px-6">
-      <header className="mx-auto max-w-2xl text-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-xs uppercase tracking-[0.2em] text-gold">
-          <Crown className="h-3.5 w-3.5" /> AfriStream Premium
+      <section className="relative overflow-hidden rounded-2xl border border-gold/20 bg-gradient-to-br from-forest-900 via-bg to-bg p-8 text-center shadow-gold sm:p-14">
+        <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
+        <div className="absolute -bottom-32 -left-10 h-72 w-72 rounded-full bg-forest/30 blur-3xl" />
+        <span className="relative inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-xs uppercase tracking-[0.2em] text-gold">
+          <Sparkles className="h-3.5 w-3.5" /> 7 jours offerts
         </span>
-        <h1 className="mt-4 font-display text-4xl font-bold leading-tight sm:text-5xl">
-          Choisissez votre <span className="text-gold-gradient">plan</span>
+        <h1 className="relative mt-4 font-display text-4xl font-bold leading-tight sm:text-6xl">
+          Profitez de tout AfriStream
+          <br />
+          <span className="text-gold-gradient">gratuitement pendant 7 jours.</span>
         </h1>
-        <p className="mt-3 text-white/70">
-          7 jours gratuits. Sans engagement. Annulable en un clic.
+        <p className="relative mx-auto mt-4 max-w-xl text-white/70">
+          Ensuite, à partir de <span className="font-semibold text-white">2,79 $/mois</span>.
+          Sans engagement · Annulable à tout moment, même pendant l'essai.
+        </p>
+        <Link
+          href="/auth/register"
+          className="relative mt-7 inline-flex items-center gap-2 rounded-full bg-gold-gradient px-7 py-3.5 font-medium text-bg shadow-gold hover:brightness-110"
+        >
+          <Sparkles className="h-4 w-4" />
+          Démarrer l'essai gratuit
+        </Link>
+      </section>
+
+      <header className="mt-16 text-center">
+        <h2 className="font-display text-3xl font-semibold sm:text-4xl">
+          Après l'essai, choisis ton <span className="text-gold-gradient">plan</span>
+        </h2>
+        <p className="mt-2 text-white/60">
+          Aucun paiement avant la fin des 7 jours. On te prévient avant.
         </p>
       </header>
 
-      <div className="mt-12 grid gap-6 md:grid-cols-2">
+      <div className="mt-10 grid gap-6 md:grid-cols-2">
         {plans.map((plan) => (
           <div
             key={plan.id}
@@ -60,10 +81,10 @@ export default function PremiumPage() {
           >
             {plan.highlight && (
               <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-gold-gradient px-2 py-0.5 text-[10px] font-semibold uppercase text-bg">
-                <Crown className="h-3 w-3" /> Recommandé
+                Recommandé
               </span>
             )}
-            <h2 className="font-display text-2xl font-semibold">{plan.name}</h2>
+            <h3 className="font-display text-2xl font-semibold">{plan.name}</h3>
             <p className="mt-3 flex items-baseline gap-1">
               <span className="text-5xl font-bold text-white">{plan.price}</span>
               <span className="text-white/60">{plan.period}</span>
@@ -89,8 +110,7 @@ export default function PremiumPage() {
                   : "border border-white/15 text-white hover:bg-white/10"
               }`}
             >
-              <Crown className="h-4 w-4" />
-              S'abonner
+              Commencer après les 7 jours
             </Link>
           </div>
         ))}
@@ -118,12 +138,16 @@ export default function PremiumPage() {
         <div className="mt-4 space-y-3">
           {[
             {
+              q: "L'essai gratuit est-il vraiment gratuit ?",
+              a: "Oui, 100% gratuit pendant 7 jours. Aucune carte n'est exigée pour démarrer. À la fin de la période, on te demande de choisir un plan pour continuer.",
+            },
+            {
               q: "Puis-je annuler à tout moment ?",
-              a: "Oui. L'abonnement se résilie en un clic depuis votre espace compte. Vous gardez l'accès jusqu'à la fin de la période payée.",
+              a: "Oui, même pendant l'essai. Tu gardes l'accès jusqu'à la fin de la période payée. Résiliation en un clic depuis ton compte.",
             },
             {
               q: "Le paiement Mobile Money fonctionne-t-il dans tous les pays ?",
-              a: "Flutterwave couvre 30+ pays africains : Sénégal, Côte d'Ivoire, Nigeria, Ghana, Cameroun, Kenya, RDC, etc.",
+              a: "Flutterwave couvre 30+ pays africains : Sénégal, Côte d'Ivoire, Guinée, Nigeria, Ghana, Cameroun, Kenya, RDC, etc.",
             },
             {
               q: "Combien d'écrans en simultané ?",
@@ -131,7 +155,7 @@ export default function PremiumPage() {
             },
             {
               q: "Le téléchargement hors-ligne est-il disponible ?",
-              a: "Oui, jusqu'à 25 titres téléchargeables sur mobile pour les abonnés Premium.",
+              a: "Oui, jusqu'à 25 titres téléchargeables sur mobile pendant l'essai et pour tous les abonnés.",
             },
           ].map((f) => (
             <details

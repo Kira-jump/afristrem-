@@ -5,14 +5,11 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 import { FilmCard } from "@/components/film-card";
 import type { FilmCard as Film } from "@/lib/films";
 
-type Access = "all" | "free" | "premium";
-
 export function CatalogueClient({ films }: { films: Film[] }) {
   const [q, setQ] = useState("");
   const [genre, setGenre] = useState<string>("");
   const [origin, setOrigin] = useState<string>("");
   const [year, setYear] = useState<string>("");
-  const [access, setAccess] = useState<Access>("all");
   const [open, setOpen] = useState(false);
 
   const genres = useMemo(
@@ -38,21 +35,18 @@ export function CatalogueClient({ films }: { films: Film[] }) {
       if (genre && f.genre !== genre) return false;
       if (origin && f.origin !== origin) return false;
       if (year && String(f.year) !== year) return false;
-      if (access === "free" && f.isPremium) return false;
-      if (access === "premium" && !f.isPremium) return false;
       return true;
     });
-  }, [films, q, genre, origin, year, access]);
+  }, [films, q, genre, origin, year]);
 
   function reset() {
     setQ("");
     setGenre("");
     setOrigin("");
     setYear("");
-    setAccess("all");
   }
 
-  const hasFilters = q || genre || origin || year || access !== "all";
+  const hasFilters = q || genre || origin || year;
 
   return (
     <div>
@@ -89,28 +83,10 @@ export function CatalogueClient({ films }: { films: Film[] }) {
         </div>
 
         {open && (
-          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
             <Select label="Genre" value={genre} onChange={setGenre} options={genres} />
             <Select label="Pays" value={origin} onChange={setOrigin} options={origins} />
             <Select label="Année" value={year} onChange={setYear} options={years.map(String)} />
-            <div>
-              <span className="mb-1 block text-xs text-white/60">Accès</span>
-              <div className="flex gap-1 rounded-md border border-white/10 bg-elevated p-1">
-                {(["all", "free", "premium"] as Access[]).map((a) => (
-                  <button
-                    key={a}
-                    onClick={() => setAccess(a)}
-                    className={`flex-1 rounded px-2 py-1.5 text-xs transition ${
-                      access === a
-                        ? "bg-gold-gradient text-bg"
-                        : "text-white/70 hover:bg-white/5"
-                    }`}
-                  >
-                    {a === "all" ? "Tout" : a === "free" ? "Gratuit" : "Premium"}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         )}
       </div>

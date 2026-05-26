@@ -1,10 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Crown, Info, Play, Star } from "lucide-react";
+import { Info, Play, Sparkles, Star } from "lucide-react";
 import type { FilmCard as Film } from "@/lib/films";
 import { formatDuration } from "@/lib/utils";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { getAccessState } from "@/lib/access";
 
-export function Hero({ film }: { film: Film }) {
+export async function Hero({ film }: { film: Film }) {
+  const session = await getServerSession(authOptions);
+  const access = getAccessState(session);
+
   return (
     <section className="relative isolate min-h-[88vh] w-full overflow-hidden">
       <Image
@@ -43,11 +49,6 @@ export function Hero({ film }: { film: Film }) {
           <span className="rounded-md border border-forest/40 bg-forest/20 px-2 py-0.5 text-xs text-forest-100">
             {film.origin}
           </span>
-          {film.isPremium && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-gold-gradient px-2 py-0.5 text-xs font-semibold text-bg">
-              <Crown className="h-3 w-3" /> Premium
-            </span>
-          )}
         </div>
 
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/80 sm:text-lg">
@@ -55,13 +56,23 @@ export function Hero({ film }: { film: Film }) {
         </p>
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <Link
-            href={`/film/${film.slug}`}
-            className="inline-flex items-center gap-2 rounded-full bg-gold-gradient px-6 py-3 font-medium text-bg shadow-gold transition hover:brightness-110"
-          >
-            <Play className="h-4 w-4 fill-current" />
-            Regarder
-          </Link>
+          {access.canWatch ? (
+            <Link
+              href={`/film/${film.slug}`}
+              className="inline-flex items-center gap-2 rounded-full bg-gold-gradient px-6 py-3 font-medium text-bg shadow-gold transition hover:brightness-110"
+            >
+              <Play className="h-4 w-4 fill-current" />
+              Regarder
+            </Link>
+          ) : (
+            <Link
+              href={access.isLogged ? "/premium" : "/auth/register"}
+              className="inline-flex items-center gap-2 rounded-full bg-gold-gradient px-6 py-3 font-medium text-bg shadow-gold transition hover:brightness-110"
+            >
+              <Sparkles className="h-4 w-4" />
+              Essai gratuit 7 jours
+            </Link>
+          )}
           <Link
             href={`/film/${film.slug}`}
             className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-white backdrop-blur transition hover:bg-white/10"
@@ -70,6 +81,12 @@ export function Hero({ film }: { film: Film }) {
             Plus d'infos
           </Link>
         </div>
+
+        {!access.isLogged && (
+          <p className="mt-3 text-xs text-white/50">
+            Sans engagement · Annulable à tout moment · Carte ou Mobile Money
+          </p>
+        )}
       </div>
     </section>
   );

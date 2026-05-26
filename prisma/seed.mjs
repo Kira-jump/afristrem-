@@ -217,16 +217,19 @@ async function main() {
     },
   });
 
-  // Test user
+  // Test user (avec essai 7 jours actif)
   const userPass = await bcrypt.hash("test1234", 10);
+  const trialEnd = new Date();
+  trialEnd.setDate(trialEnd.getDate() + 7);
   await prisma.user.upsert({
     where: { email: "user@afristream.tv" },
-    update: {},
+    update: { trialEndsAt: trialEnd },
     create: {
       email: "user@afristream.tv",
       name: "Test User",
       passwordHash: userPass,
       role: "USER",
+      trialEndsAt: trialEnd,
     },
   });
 

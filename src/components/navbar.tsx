@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { Crown, Menu, Search, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Crown, Menu, Search, Sparkles, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { Logo } from "./logo";
 import { cn } from "@/lib/utils";
+import { daysLeft, isTrialActive } from "@/lib/access";
 
 const links = [
   { href: "/", label: "Accueil" },
@@ -27,6 +28,13 @@ export function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const trial = useMemo(() => {
+    const t = session?.user?.trialEndsAt ?? null;
+    return { active: isTrialActive(t), left: daysLeft(t) };
+  }, [session]);
+
+  const isPremium = !!session?.user?.isPremium;
 
   return (
     <header
@@ -72,6 +80,19 @@ export function Navbar() {
 
           {session?.user ? (
             <div className="hidden items-center gap-2 md:flex">
+              {trial.active && !isPremium && (
+                <Link
+                  href="/premium"
+                  className="hidden rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-xs text-gold lg:inline-flex"
+                >
+                  Essai · J-{trial.left}
+                </Link>
+              )}
+              {isPremium && (
+                <span className="hidden rounded-full bg-gold-gradient px-3 py-1 text-xs font-semibold text-bg lg:inline-flex items-center gap-1">
+                  <Crown className="h-3 w-3" /> Premium
+                </span>
+              )}
               {session.user.role === "ADMIN" && (
                 <Link
                   href="/dashboard/admin"
@@ -99,11 +120,11 @@ export function Navbar() {
                 Connexion
               </Link>
               <Link
-                href="/premium"
+                href="/auth/register"
                 className="inline-flex items-center gap-1.5 rounded-md bg-gold-gradient px-3 py-1.5 text-sm font-medium text-bg shadow-gold transition hover:brightness-110"
               >
-                <Crown className="h-3.5 w-3.5" />
-                Devenir Premium
+                <Sparkles className="h-3.5 w-3.5" />
+                Essai gratuit 7 jours
               </Link>
             </div>
           )}
@@ -134,6 +155,15 @@ export function Navbar() {
             <div className="mt-3 flex flex-col gap-2 border-t border-white/5 pt-3">
               {session?.user ? (
                 <>
+                  {trial.active && !isPremium && (
+                    <Link
+                      href="/premium"
+                      onClick={() => setOpen(false)}
+                      className="rounded-md border border-gold/30 bg-gold/10 px-3 py-2 text-center text-xs text-gold"
+                    >
+                      Essai gratuit · J-{trial.left}
+                    </Link>
+                  )}
                   {session.user.role === "ADMIN" && (
                     <Link
                       href="/dashboard/admin"
@@ -160,11 +190,11 @@ export function Navbar() {
                     Connexion
                   </Link>
                   <Link
-                    href="/premium"
+                    href="/auth/register"
                     onClick={() => setOpen(false)}
                     className="rounded-md bg-gold-gradient px-3 py-2 text-center text-sm font-medium text-bg"
                   >
-                    Devenir Premium
+                    Essai gratuit 7 jours
                   </Link>
                 </>
               )}

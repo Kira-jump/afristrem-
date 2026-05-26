@@ -10,6 +10,7 @@ declare module "next-auth" {
       image?: string | null;
       role?: "USER" | "ADMIN";
       isPremium?: boolean;
+      trialEndsAt?: string | null;
     };
   }
 }
@@ -19,5 +20,6 @@ declare module "next-auth/jwt" {
     uid?: string;
     role?: "USER" | "ADMIN";
     isPremium?: boolean;
+    trialEndsAt?: string | null;
   }
 }

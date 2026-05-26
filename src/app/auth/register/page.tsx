@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { Loader2, Mail, Lock, User, Crown } from "lucide-react";
+import { Loader2, Mail, Lock, User, Sparkles } from "lucide-react";
 import { Logo } from "@/components/logo";
 
 export default function RegisterPage() {
@@ -45,10 +45,12 @@ export default function RegisterPage() {
           <Logo />
           <div>
             <h2 className="font-display text-4xl font-bold leading-tight">
-              Rejoignez la communauté <span className="text-gold-gradient">AfriStream</span>.
+              <span className="text-gold-gradient">7 jours gratuits</span>
+              <br />
+              sur tout AfriStream.
             </h2>
             <p className="mt-4 max-w-md text-white/70">
-              7 jours gratuits sur le catalogue Premium. Annulable à tout moment.
+              Aucune carte requise pour commencer. Annulable à tout moment.
             </p>
           </div>
         </div>
@@ -142,8 +144,8 @@ export default function RegisterPage() {
               disabled={loading}
               className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-gold-gradient py-3 text-sm font-medium text-bg shadow-gold transition hover:brightness-110 disabled:opacity-60"
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
-              Créer mon compte
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              Démarrer mon essai gratuit
             </button>
           </form>
         </div>
