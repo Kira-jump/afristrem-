@@ -1,0 +1,190 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------- AUTH (NextAuth required tables) ----------------
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ---------------- DOMAIN ----------------
+enum Role {
+  USER
+  ADMIN
+}
+
+enum SubPlan {
+  MONTHLY
+  YEARLY
+}
+
+enum SubStatus {
+  ACTIVE
+  CANCELED
+  EXPIRED
+  PENDING
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  role          Role      @default(USER)
+  isPremium     Boolean   @default(false)
+  country       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  subscriptions Subscription[]
+  watchHistory  WatchHistory[]
+  watchlist     Watchlist[]
+}
+
+model Film {
+  id           String   @id @default(cuid())
+  title        String
+  slug         String   @unique
+  synopsis     String   @db.Text
+  origin       String   // ex: "Sénégal", "Nigeria"
+  genre        String   // ex: "Drame", "Action"
+  year         Int
+  duration     Int      // minutes
+  isPremium    Boolean  @default(false)
+  isFeatured   Boolean  @default(false)
+  videoUrl     String   // HLS .m3u8 ou Mux playback id
+  trailerUrl   String?
+  thumbnailUrl String
+  backdropUrl  String?
+  rating       Float    @default(0)
+  cast         String?  @db.Text
+  director     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  watchHistory WatchHistory[]
+  watchlist    Watchlist[]
+
+  @@index([genre])
+  @@index([origin])
+  @@index([year])
+}
+
+model Series {
+  id           String   @id @default(cuid())
+  title        String
+  slug         String   @unique
+  synopsis     String   @db.Text
+  origin       String
+  genre        String
+  seasons      Int      @default(1)
+  isPremium    Boolean  @default(false)
+  thumbnailUrl String
+  backdropUrl  String?
+  rating       Float    @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  episodes Episode[]
+}
+
+model Episode {
+  id        String   @id @default(cuid())
+  seriesId  String
+  season    Int
+  episode   Int
+  title     String
+  synopsis  String?  @db.Text
+  duration  Int
+  videoUrl  String
+  thumbnailUrl String?
+  createdAt DateTime @default(now())
+
+  series Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+
+  @@unique([seriesId, season, episode])
+}
+
+model Subscription {
+  id         String     @id @default(cuid())
+  userId     String
+  plan       SubPlan
+  status     SubStatus  @default(PENDING)
+  provider   String     // "stripe" | "flutterwave"
+  stripeId   String?    @unique
+  flwRef     String?    @unique
+  amount     Float
+  currency   String     @default("USD")
+  startedAt  DateTime   @default(now())
+  expiresAt  DateTime
+  createdAt  DateTime   @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model WatchHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  filmId    String
+  progress  Float    @default(0) // 0..1
+  watchedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  film Film @relation(fields: [filmId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, filmId])
+}
+
+model Watchlist {
+  id        String   @id @default(cuid())
+  userId    String
+  filmId    String
+  addedAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  film Film @relation(fields: [filmId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, filmId])
+}
