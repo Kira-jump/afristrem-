@@ -1,4 +1,5 @@
-import type { Session } from "next-auth";
+import { getServerSession, type Session } from "next-auth";
+import { authOptions } from "./auth";
 
 export const TRIAL_DAYS = 7;
 
@@ -29,6 +30,15 @@ export type AccessState = {
   /** A user can watch any film if true. */
   canWatch: boolean;
 };
+
+/** Safe wrapper: never throws even if NEXTAUTH_SECRET is missing or DB is down. */
+export async function safeGetSession(): Promise<Session | null> {
+  try {
+    return await getServerSession(authOptions);
+  } catch {
+    return null;
+  }
+}
 
 export function getAccessState(session: Session | null): AccessState {
   const isLogged = !!session?.user;

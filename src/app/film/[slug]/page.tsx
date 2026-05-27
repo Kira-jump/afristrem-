@@ -5,9 +5,7 @@ import { Lock, Play, Sparkles, Star } from "lucide-react";
 import { getFilmBySlug, getRelatedFilms } from "@/lib/films";
 import { FilmRow } from "@/components/film-row";
 import { HlsPlayer } from "@/components/hls-player";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { getAccessState } from "@/lib/access";
+import { getAccessState, safeGetSession } from "@/lib/access";
 import { formatDuration } from "@/lib/utils";
 
 export default async function FilmPage({
@@ -18,7 +16,7 @@ export default async function FilmPage({
   const film = await getFilmBySlug(params.slug);
   if (!film) notFound();
 
-  const session = await getServerSession(authOptions);
+  const session = await safeGetSession();
   const access = getAccessState(session);
   const related = await getRelatedFilms(film);
 

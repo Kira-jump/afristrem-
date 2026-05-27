@@ -8,7 +8,8 @@ import {
   groupByOrigin,
 } from "@/lib/films";
 
-export const revalidate = 60;
+// Page dynamique (Hero lit la session pour adapter le CTA).
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const [featured, all] = await Promise.all([getFeaturedFilm(), getAllFilms()]);

@@ -3,12 +3,10 @@ import Link from "next/link";
 import { Info, Play, Sparkles, Star } from "lucide-react";
 import type { FilmCard as Film } from "@/lib/films";
 import { formatDuration } from "@/lib/utils";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { getAccessState } from "@/lib/access";
+import { getAccessState, safeGetSession } from "@/lib/access";
 
 export async function Hero({ film }: { film: Film }) {
-  const session = await getServerSession(authOptions);
+  const session = await safeGetSession();
   const access = getAccessState(session);
 
   return (
