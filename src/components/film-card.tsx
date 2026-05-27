@@ -3,6 +3,9 @@ import Image from "next/image";
 import { Play, Star } from "lucide-react";
 import type { FilmCard as Film } from "@/lib/films";
 import { formatDuration } from "@/lib/utils";
+import { blurFor } from "@/lib/blur";
+
+const BLUR = blurFor(280, 420);
 
 export function FilmCard({ film, size = "md" }: { film: Film; size?: "sm" | "md" | "lg" }) {
   const dims =
@@ -23,6 +26,9 @@ export function FilmCard({ film, size = "md" }: { film: Film; size?: "sm" | "md"
           alt={film.title}
           fill
           sizes="(max-width:640px) 50vw, 280px"
+          loading="lazy"
+          placeholder="blur"
+          blurDataURL={BLUR}
           className="object-cover transition duration-500 group-hover:scale-[1.04]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/20 to-transparent opacity-90" />

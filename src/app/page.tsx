@@ -1,5 +1,6 @@
 import { Hero } from "@/components/hero";
 import { FilmRow } from "@/components/film-row";
+import { Pillars } from "@/components/pillars";
 import { PremiumCTA } from "@/components/premium-cta";
 import { getAllFilms, getFeaturedFilm } from "@/lib/films";
 
@@ -13,7 +14,9 @@ export default async function HomePage() {
     <div className="pb-24">
       {featured && <Hero film={featured} />}
 
-      <div className="relative -mt-24">
+      <Pillars />
+
+      <div className="relative">
         <FilmRow title="À la une" films={trending} />
       </div>
 

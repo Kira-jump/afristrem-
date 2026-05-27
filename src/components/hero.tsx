@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Info, Play, Sparkles, Star } from "lucide-react";
+import { Info, Play, PlayCircle, Sparkles, Star } from "lucide-react";
 import type { FilmCard as Film } from "@/lib/films";
 import { formatDuration } from "@/lib/utils";
 import { getAccessState, safeGetSession } from "@/lib/access";
@@ -53,7 +53,7 @@ export async function Hero({ film }: { film: Film }) {
           {film.synopsis}
         </p>
 
-        <div className="mt-7 flex flex-wrap gap-3">
+        <div className="mt-7 flex flex-wrap items-center gap-3">
           {access.canWatch ? (
             <Link
               href={`/film/${film.slug}`}
@@ -71,9 +71,22 @@ export async function Hero({ film }: { film: Film }) {
               Essai gratuit 7 jours
             </Link>
           )}
+
+          {film.trailerUrl && (
+            <a
+              href={film.trailerUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-3 text-white backdrop-blur transition hover:bg-white/10"
+            >
+              <PlayCircle className="h-4 w-4" />
+              Bande-annonce
+            </a>
+          )}
+
           <Link
             href={`/film/${film.slug}`}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-white backdrop-blur transition hover:bg-white/10"
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-3 text-white backdrop-blur transition hover:bg-white/10"
           >
             <Info className="h-4 w-4" />
             Plus d'infos

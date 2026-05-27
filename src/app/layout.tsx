@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Providers } from "@/components/providers";
+import { CookieBanner } from "@/components/cookie-banner";
 
 const sans = DM_Sans({
   subsets: ["latin"],
@@ -41,6 +42,7 @@ export default function RootLayout({
           <Navbar />
           <main className="min-h-[calc(100vh-200px)]">{children}</main>
           <Footer />
+          <CookieBanner />
         </Providers>
       </body>
     </html>
