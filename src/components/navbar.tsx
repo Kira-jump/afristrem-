@@ -95,7 +95,7 @@ export function Navbar() {
               )}
               {session.user.role === "ADMIN" && (
                 <Link
-                  href="/dashboard/admin"
+                  href="/admin"
                   className="rounded-md px-3 py-1.5 text-sm text-white/80 hover:text-gold"
                 >
                   Admin
@@ -166,11 +166,11 @@ export function Navbar() {
                   )}
                   {session.user.role === "ADMIN" && (
                     <Link
-                      href="/dashboard/admin"
+                      href="/admin"
                       onClick={() => setOpen(false)}
                       className="rounded-md px-3 py-2 text-sm text-white/80 hover:bg-white/5"
                     >
-                      Dashboard admin
+                      Console admin
                     </Link>
                   )}
                   <button

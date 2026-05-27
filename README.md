@@ -38,7 +38,7 @@ Vercel rebuildera tout seul. La home devrait redevenir verte même sans env vars
 | `STRIPE_SECRET_KEY` + `STRIPE_PRICE_MONTHLY` + `STRIPE_PRICE_YEARLY` + `STRIPE_WEBHOOK_SECRET` | Paiement diaspora | dashboard.stripe.com |
 | `FLUTTERWAVE_PUBLIC_KEY` + `FLUTTERWAVE_SECRET_KEY` + `FLUTTERWAVE_ENCRYPTION_KEY` | Mobile Money | dashboard.flutterwave.com |
 | `MUX_TOKEN_ID` + `MUX_TOKEN_SECRET` | Upload vidéo | mux.com |
-| `CLOUDINARY_URL` + `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | Thumbnails | cloudinary.com |
+| `CLOUDINARY_URL` + `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` + `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` | Thumbnails (upload widget admin) | cloudinary.com — créer un **unsigned upload preset** dans Settings → Upload |
 
 Après ajout → **Deployments → ⋯ → Redeploy**.
 
@@ -121,6 +121,27 @@ cp .env.example .env  # éditer
 npx prisma db push
 npm run dev           # http://localhost:3000
 ```
+
+## 🛡️ Console admin — `/admin`
+
+Section privée séparée du site public.
+
+- **Protection** : middleware Next.js (`src/middleware.ts`) bloque toute requête `/admin/*` sans JWT `role === "ADMIN"` (redirige vers `/auth/login`). Double-check serveur dans chaque page via `requireAdmin()`.
+- **Routes** :
+  - `/admin` — dashboard avec 6 KPI (films, séries, abonnés Premium, revenus du mois, total users, essais actifs)
+  - `/admin/films` — liste + CRUD (créer / modifier / supprimer)
+  - `/admin/series` — idem + gestion des épisodes (`/admin/series/[id]/episodes`)
+  - `/admin/users` — liste, recherche, toggle Premium, toggle role ADMIN
+  - `/admin/uploads` — upload direct vers Mux avec progress bar (`@mux/upchunk`)
+- **API** :
+  - `POST/PUT/DELETE /api/admin/films[/id]`
+  - `POST/PUT/DELETE /api/admin/series[/id]`
+  - `POST /api/admin/series/[id]/episodes`, `DELETE /api/admin/episodes/[id]`
+  - `PATCH /api/admin/users/[id]` — toggle `field=isPremium|role`
+  - `POST /api/admin/mux/upload` (create upload), `GET ?id=` (poll asset status)
+- **Comptes seed** :
+  - Admin : `admin@afristream.tv` / `admin1234`
+  - User : `user@afristream.tv` / `test1234`
 
 ## 📋 Roadmap
 

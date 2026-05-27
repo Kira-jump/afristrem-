@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",
+    "@mux/mux-node": "^8.8.0",
+    "@mux/upchunk": "^3.4.0",
     "@prisma/client": "^5.22.0",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
